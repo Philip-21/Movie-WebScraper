@@ -21,9 +21,6 @@ soup = BeautifulSoup(response.text, "html.parser")
 #gettig the movie and genre
 movies = soup.select('td.titleColumn')
 genre = soup.find("a", href="search/title?genres")
-crew = [a.attrs.get('title') for a in soup.select('td.titleColumn a')]
-ratings = [b.attrs.get('data-value')
-           for b in soup.select('td.posterColumn span[name=ir]')]
 
 # create a empty list for storing
 # movie information
@@ -33,7 +30,6 @@ list = []
 # each movie's details
 for index in range(0, len(movies)):
     # Separating movie into: 'place',
-    # 'title', 'year'
     movie_string = movies[index].ent
     movie = (' '.join(movie_string.split(",")).replace('.', ''))
     movie_title = movie[len(str(index)) + 1:-7]
