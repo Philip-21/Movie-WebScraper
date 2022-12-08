@@ -1,8 +1,4 @@
-# from bs4 import BeautifulSoup as bs
-# import html as html 
-# import re 
-# import requests
-# from requests_html import HTMLSession 
+
 import requests,webbrowser
 import json
 import csv
@@ -12,52 +8,52 @@ import pandas as pd
 
 import PyMovieDb
 from PyMovieDb import IMDB
-from tkinter import *
 
 
 
-def Youtube():
 
 
-    # Downloading imdb top 250 movie's data
-    url = 'http://www.imdb.com/chart/top'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
-    movies = soup.select('td.titleColumn')
-    crew = [a.attrs.get('title') for a in soup.select('td.titleColumn a')]
-    ratings = [b.attrs.get('data-value')
-               for b in soup.select('td.posterColumn span[name=ir]')]
+# Downloading imdb top 250 movie's data
+url = 'http://www.imdb.com/chart/top'
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "html.parser")
 
-    # create a empty list for storing
-    # movie information
-    list = []
+#gettig the movie and genre
+movies = soup.select('td.titleColumn')
+genre = soup.find("a", href="search/title?genres")
+crew = [a.attrs.get('title') for a in soup.select('td.titleColumn a')]
+ratings = [b.attrs.get('data-value')
+           for b in soup.select('td.posterColumn span[name=ir]')]
 
-    # Iterating over movies to extract
-    # each movie's details
-    for index in range(0, len(movies)):
-        # Separating movie into: 'place',
-        # 'title', 'year'
-        movie_string = movies[index].ent
-        movie = (' '.join(movie_string.split()).replace('.', ''))
-        movie_title = movie[len(str(index)) + 1:-7]
-        year = re.search('\((.*?)\)', movie_string).group(1)
-        place = movie[:len(str(index)) - (len(movie))]
-        data = {"place": place,
-                "movie_title": movie_title,
-                "rating": ratings[index],
-                "year": year,
-                "star_cast": crew[index],
-                }
-        list.append(data)
+# create a empty list for storing
+# movie information
+list = []
 
-    # printing movie details with its rating.
-    for movie in list:
-        print(movie['place'], '-', movie['movie_title'], '(' + movie['year'] +
-              ') -', 'Starring:', movie['star_cast'], movie['rating'])
+# Iterating over movies to extract
+# each movie's details
+for index in range(0, len(movies)):
+    # Separating movie into: 'place',
+    # 'title', 'year'
+    movie_string = movies[index].ent
+    movie = (' '.join(movie_string.split(",")).replace('.', ''))
+    movie_title = movie[len(str(index)) + 1:-7]
+    year = re.search('\((.*?)\)', movie_string).group(1)
+    place = movie[:len(str(index)) - (len(movie))]
+    data = {"place": place,
+            "genre": genre,
+            }
+    list.append(data)
 
-    ##.......##
-    df = pd.DataFrame(list)
-    df.to_csv('movies.csv', index=False)
+# printing movie details with its rating.
+for movie in list:
+    print(movie['place'], '-', movie['movie_title'], '(' + movie['genre'] +
+          ') -')
+
+#saving the list as dataframe
+#then converting into .csv file
+df = pd.DataFrame(list)
+df.to_csv('movies.csv', index=False)
+
 
 # imdb = IMDB()
 # #getting user input
