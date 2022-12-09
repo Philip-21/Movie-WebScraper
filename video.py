@@ -19,7 +19,9 @@ response = requests.get(url)
 soup = BeautifulSoup(response.text, "html.parser")
 
 #gettig the movie and genre
-movies = soup.select('td.titleColumn')
+movies = soup.find("h1",attrs={"data-testid": 'hero-title-block_title'})
+
+#movies = soup.select('td.titleColumn')
 genre = soup.find("a", href="search/title?genres")
 
 # create a empty list for storing
@@ -28,21 +30,18 @@ list = []
 
 # Iterating over movies to extract
 # each movie's details
-for index in range(0, len(movies)):
-    # Separating movie into: 'place',
-    movie_string = movies[index].ent
-    movie = (' '.join(movie_string.split(",")).replace('.', ''))
-    movie_title = movie[len(str(index)) + 1:-7]
-    year = re.search('\((.*?)\)', movie_string).group(1)
-    place = movie[:len(str(index)) - (len(movie))]
-    data = {"place": place,
+for index in range(list):
+
+    movie_string = movies[index].get_text()
+    genre = genre[index].get_text()
+    data = {"movie_title": movie_string,
             "genre": genre,
             }
     list.append(data)
 
 # printing movie details with its rating.
 for movie in list:
-    print(movie['place'], '-', movie['movie_title'], '(' + movie['genre'] +
+    print(movie['movie_title'], '(' + movie['genre'] +
           ') -')
 
 #saving the list as dataframe
